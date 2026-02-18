@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+
+# Config files with credentials
+config/local.config.json
+config/*.local.json
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

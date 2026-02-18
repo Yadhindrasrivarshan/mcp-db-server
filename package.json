@@ -1,0 +1,34 @@
+{
+  "name": "mcp-db-server",
+  "version": "0.1.0",
+  "description": "MCP server for dynamic database connections (Postgres & Redis)",
+  "type": "module",
+  "bin": {
+    "mcp-db-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "node --watch build/index.js",
+    "start": "node build/index.js",
+    "client:dev": "node build/client.js"
+  },
+  "keywords": [
+    "mcp",
+    "postgres",
+    "redis",
+    "database"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "pg": "^8.13.1",
+    "redis": "^4.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "typescript": "^5.7.2"
+  }
+}
