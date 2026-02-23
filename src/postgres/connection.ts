@@ -75,12 +75,13 @@ export class PostgresConnection {
   /**
    * List all tables in the current database
    */
-  async listTables(): Promise<string[]> {
+  async listTables(schema: string): Promise<string[]> {
     const result = await this.query(
       `SELECT tablename 
        FROM pg_tables 
-       WHERE schemaname = 'public' 
-       ORDER BY tablename`
+       WHERE schemaname = $1
+       ORDER BY tablename`,
+       [schema]
     );
     return result.rows.map((row: any) => row.tablename);
   }
@@ -88,7 +89,7 @@ export class PostgresConnection {
   /**
    * Describe table schema
    */
-  async describeTable(tableName: string): Promise<any[]> {
+  async describeTable(tableName: string, schema: string): Promise<any[]> {
     const result = await this.query(
       `SELECT 
         column_name,
@@ -97,9 +98,9 @@ export class PostgresConnection {
         is_nullable,
         column_default
        FROM information_schema.columns
-       WHERE table_schema = 'public' AND table_name = $1
+       WHERE table_schema = $1 AND table_name = $2
        ORDER BY ordinal_position`,
-      [tableName]
+      [schema, tableName]
     );
     return result.rows;
   }
@@ -114,6 +115,16 @@ export class PostgresConnection {
        ORDER BY datname`
     );
     return result.rows.map((row: any) => row.datname);
+  }
+
+  /**
+   * Get the row count of a table
+   */
+  async countTableRows(tableName: string, schema: string): Promise<number>{
+    const result = await this.query(
+       `SELECT COUNT(*) as count FROM ${schema}.${tableName}`
+    );
+    return parseInt(result.rows[0].count, 10);
   }
 
   /**
