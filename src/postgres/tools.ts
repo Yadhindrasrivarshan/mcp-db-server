@@ -47,20 +47,7 @@ export function registerPostgresTools(server: McpServer, connection: PostgresCon
       }),
     },
     async ({ tableName, schema = 'public' }) => {
-      const result = await connection.query(
-        `
-        SELECT 
-          column_name,
-          data_type,
-          is_nullable,
-          column_default,
-          character_maximum_length
-        FROM information_schema.columns
-        WHERE table_schema = $1 AND table_name = $2
-        ORDER BY ordinal_position
-        `,
-        [schema, tableName]
-      );
+      const result = await connection.describeTable(tableName, schema);
 
       return {
         content: [
@@ -70,7 +57,7 @@ export function registerPostgresTools(server: McpServer, connection: PostgresCon
               {
                 schema,
                 table: tableName,
-                columns: result.rows,
+                columns: result,
               },
               null,
               2
@@ -92,18 +79,7 @@ export function registerPostgresTools(server: McpServer, connection: PostgresCon
       }),
     },
     async ({ schema = 'public' }) => {
-      const result = await connection.query(
-        `
-        SELECT 
-          table_name,
-          table_type
-        FROM information_schema.tables
-        WHERE table_schema = $1
-        ORDER BY table_name
-        `,
-        [schema]
-      );
-
+      const tables = await connection.listTables(schema);
       return {
         content: [
           {
@@ -111,7 +87,7 @@ export function registerPostgresTools(server: McpServer, connection: PostgresCon
             text: JSON.stringify(
               {
                 schema,
-                tables: result.rows,
+                tables: tables,
               },
               null,
               2
@@ -134,9 +110,7 @@ export function registerPostgresTools(server: McpServer, connection: PostgresCon
       }),
     },
     async ({ tableName, schema = 'public' }) => {
-      const result = await connection.query(
-        `SELECT COUNT(*) as count FROM ${schema}.${tableName}`
-      );
+      const count = await connection.countTableRows(tableName, schema);
 
       return {
         content: [
@@ -146,7 +120,7 @@ export function registerPostgresTools(server: McpServer, connection: PostgresCon
               {
                 schema,
                 table: tableName,
-                count: parseInt(result.rows[0].count, 10),
+                count: count,
               },
               null,
               2

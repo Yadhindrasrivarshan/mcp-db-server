@@ -25,6 +25,9 @@ async function main() {
     const users = await client.postgresQuery('SELECT * FROM users LIMIT 2');
     console.log('Users:', users);
 
+    const usersCount = await client.postgresCount('users');
+    console.log('Total users count:', usersCount);
+
     console.log('\n--- Redis Operations ---\n');
 
     const userKeys = await client.redisKeys('user:*');
